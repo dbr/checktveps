@@ -192,7 +192,7 @@ if valid.__len__() > 0:
 			if missing_eps.__len__() == 0:
 				cur_colour = "blue"
 			else:
-				cur_colour = "blue"
+				cur_colour = "red"
 			
 			# Print season title in above colour.
 			print "\t",colour("Season " + str(seas),colour=cur_colour)
