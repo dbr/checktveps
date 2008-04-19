@@ -32,10 +32,11 @@ def colour(text,colour="red"):
 # Episode name. (can be empty)
 #
 # Valid episode names:
+# Show name - [01x01-02] - The Episode Name (Part 1)
 # Show name - [01x23] - The Episode Name (Part 1)
 # Show name - [01x23] - The Episode Name
 # Show name - [04x01]
-tv_ep_name = re.compile("([\w ]+) - \[(\d{2})x(\d{2})\](?= - ([\w\(\) ]+))?")
+tv_ep_name = re.compile("([-\w ]+) - \[(\d{2})x(\d{2}|\d{2}-\d{2})\](?= - ([\w\(\) ]+))?")
 
 ###################################
 # Regex to match valid, but not-to-be-processed files (dot-files, folder.jpg artwork)
@@ -143,6 +144,31 @@ if valid.__len__() > 0:
 		curshow={}
 		for curep in alleps:
 			season,epno,title = curep
+			try:
+				season = int(season)
+			except ValueError:
+				print "Error: Season number not integer. Check naming or tv_ep_name regex."
+			#end try
+			try:
+				epno = int(epno)
+			except:
+				# deal with episode numbered like - [01x01-02]
+				# TODO: Currently very hackish, improve the handling of [01x01-02] names
+				split_two_eps = epno.split("-")
+				if len(split_two_eps) == 2:
+					p1,p2 = split_two_eps
+					epno,ep2 = int(p1),int(p2)
+					
+					# Add the second part, then add the first as usual. Messy, but works
+					if curshow.has_key(season):
+						curshow[season].append(ep2)
+					else:
+						curshow[season]=[ep2]
+					#end if curshow
+				else:
+					print "Error: Episode number not integer, or two integers (01-02)"
+			#end try
+			
 			if curshow.has_key(season):
 				curshow[season].append(epno)
 			else:
@@ -151,22 +177,27 @@ if valid.__len__() > 0:
 		
 		for seas,eps in curshow.items():
 			# Check for missing episodes (by looking for gaps in sequence)
-			mi,ma=min(eps),max(eps)
+			mi,ma=int(min(eps)),int(max(eps))
 			missing_eps=[]
 			for x in range(1,int(ma)+1):
-				if not x in [int(y) for y in eps]:
-					missing_eps.append(x)
+				try:
+					if not x in [int(y) for y in eps]:
+						missing_eps.append(x)
+				except ValueError:
+					pass # start value is 01-02 probably.
+				#end try
+			#end for x
 				
 			# if we are missing an episode, "season 01" title becomes red.
 			if missing_eps.__len__() == 0:
-				cur_colour = 'blue'
+				cur_colour = "blue"
 			else:
-				cur_colour = 'red'
+				cur_colour = "blue"
 			
 			# Print season title in above colour.
-			print "\t",colour("Season " + seas,colour=cur_colour)
+			print "\t",colour("Season " + str(seas),colour=cur_colour)
 			# And list episodes
-			print "\t\t", "Episodes:", ", ".join(eps)
+			print "\t\t", "Episodes:", ", ".join([str(e) for e in eps])
 			# And if there is missing episodes, list them.
 			if missing_eps.__len__() != 0:
 				print "\t\t","Missing:", ", ".join([str(m) for m in missing_eps])
