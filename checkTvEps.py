@@ -36,12 +36,17 @@ def colour(text,colour="red"):
 # Show name - [01x23] - The Episode Name (Part 1)
 # Show name - [01x23] - The Episode Name
 # Show name - [04x01]
-tv_ep_name = re.compile("([-\w ]+) - \[(\d{2})x(\d{2}|\d{2}-\d{2})\](?= - ([\w\(\) ]+))?")
+tv_ep_name = [
+	re.compile("([-\w ]+) - \[(\d{2})x(\d{2}|\d{2}-\d{2})\](?= - ([\w\(\) ]+))?"),
+]
 
 ###################################
 # Regex to match valid, but not-to-be-processed files (dot-files, folder.jpg artwork)
 ###################################
-decrappify = re.compile("(?=^[.]{1}.*|folder.jpg)")
+decrappify = [
+	re.compile("(?=^[.]{1}.*)"),
+	re.compile("folder.jpg"),
+]
 
 # Location to process
 loc = "." # Runs from the current path
@@ -53,16 +58,22 @@ loc = "." # Runs from the current path
 #TODO: Array of valid extensions (not just .avi)
 import path
 d = path.path(loc)
-list=[]
-for f in d.walkfiles("*.avi"):
-	list.append( str(f) )
+allfiles=[]
+for f in d.walkfiles("*"):
+	allfiles.append( str(f) )
+#end for f
 
-#Old, non-recursive version (that doesn't need the path.py module): 
-#list = os.listdir(loc) # list dir
+files = [x for x in allfiles if os.path.isfile(x)] # only get files, not folders
 
-list = [x for x in list if decrappify.match(x)] # Strip out dotfiles/folder.jpg
-list = [os.path.join(loc,x) for x in list] # append path to file name
-files = [x for x in list if os.path.isfile(x)] # only get files, not folders
+# Strip out dotfiles/folder.jpg
+for current_file in allfiles:
+	current_file_path,current_file_name = os.path.split(current_file)
+	for cur_decrap in decrappify:
+		if cur_decrap.match(current_file_name):
+			files.remove(current_file)
+#end for file
+
+#files = [os.path.join(loc,x) for x in files] # append path to file name
 
 # Warn if no files are found, then exit
 if files.__len__() == 0:
@@ -77,14 +88,17 @@ valid   = []
 invalid = []
 
 for cur in files:
-	check = tv_ep_name.findall(cur)
-	if check:
-		# Valid file name
-		valid.append(check)
+	for cur_checker in tv_ep_name:
+		check = cur_checker.findall(cur)
+		if check:
+			# Valid file name
+			valid.append(check)
+			break # Found valid episode, skip to the next one
+		#end if
 	else:
-		# Invalid name
+		# No match found (Invalid name)
 		invalid.append(cur)
-	#end if
+	#end for cur_checker
 #end for
 
 ###################################
