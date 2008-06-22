@@ -105,7 +105,7 @@ files = [os.path.join(loc,x) for x in files] # append path to file name
 # Warn if no files are found, then exit
 if files.__len__() == 0:
     print colour('No files found','red')
-    sys.exit(0)
+    sys.exit(1)
 
 
 errors = {
