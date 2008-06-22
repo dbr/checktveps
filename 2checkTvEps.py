@@ -166,8 +166,17 @@ for cur in files:
 ###################################
 # Show invalid names
 ###################################
-for errorno,errordescr in errors.items():
-    print errorno,errordescr,":"
-    print "*"*20
-    for c in getError(invalid,errorno):
-        print c['filename']
+if len(invalid) > 0:
+    print colour('WARNING', 'red'), ': Invalid file-names found'
+    
+    for errorno,errordescr in errors.items():
+        errors = getError(invalid,errorno)
+        if len(errors) == 0: continue
+        
+        errormsg = "# %s (error code %d)" % (errordescr, errorno)
+        print "#"*len(errormsg)
+        print errormsg
+        print "#"*len(errormsg)
+    
+        for c in errors:
+            print c['filename']
