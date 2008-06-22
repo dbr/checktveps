@@ -98,7 +98,7 @@ for current_file in allfiles:
     for cur_decrap in decrappify:
         if cur_decrap.match(current_file_name):
             files.remove(current_file)
-#end for file
+#end for current_file
 
 files = [os.path.join(loc,x) for x in files] # append path to file name
 
