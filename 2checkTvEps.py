@@ -113,6 +113,8 @@ errors = {
     2:'missing epsiode name',
     3:'path is incorrect'
 }
+
+
 ###################################
 # Validate filenames
 ###################################
