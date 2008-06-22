@@ -143,7 +143,7 @@ for cur in files:
         if check:
             # Valid file name
             valid.append({'path':cpath,'filename':cfile,
-                            'cext':cext})
+                            'cext':cext, 'match':check[0]})
             break # Found valid episode, skip to the next one
         #end if
     else:
