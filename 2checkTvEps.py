@@ -29,6 +29,28 @@ def getError(invalid,errorno):
     return ret
 #end searchError
 
+
+###################################
+# Configs
+###################################
+
+# Error-code to error-description mapping
+errors = {
+    1:'malformed name',
+    2:'missing epsiode name',
+    3:'path is incorrect'
+}
+
+# Regex configs
+regex_config={}
+
+# Character class for valid episode/show names.
+# Example: [a-zA-Z0-9\-'\ ]
+regex_config['valid_in_names'] = "[\w\(\).'\ \-]"
+
+# Location to process
+loc = "." # Runs from the current path
+
 ###################################
 # Name regexs
 ###################################
@@ -36,30 +58,41 @@ def getError(invalid,errorno):
 # Should return 4 groups:
 # Series name.
 # Season number.
-# Episode number#
-# Episode name. (can be empty)
-# Ignore filetype extension
+# Episode number.
+# Episode name.
+# Ignore filetype extension.
+#
+# If there are 3 groups, they are treated as:
+# Series name, epiosde number, episode name. Season number is defaulted to "1"
 #
 # Show name - [01x01-02] - The Episode Name (Part 1)
 # Show name - [01x23] - The Episode Name (Part 1)
 # Show name - [01x23] - The Episode Name
+# Show name - [01xExtra01] - DVD Extra Feature 1
+# Show name - [01xSpecial01] - Special Episode 1
+# Show name - [01] - First episode
+
 r_with_ep_name = [
-    re.compile("([-\w\d ]+) - \[(\d{2})x\d{2}\] - ([\w\(\) ]+)"),
-    re.compile("([-\w\d ]+) - \[(\d{2})x(\d{2}-\d{2})\] - ([\w\(\) ]+)"),
-    re.compile("([-\w\d ]+) - \[(\d{2})xSpecial\d{1,2}\] - ([\w\(\) ]+)"),
-    re.compile("([-\w\d ]+) - \[(\d{2})xExtra\d{1,2}\] - ([\w\(\) ]+)"),
-    re.compile("([-\w\d ]+) - \[(\d{2})] - ([\w\(\) ]+)"),
+    re.compile("(%(valid_in_names)s+) - \[(\d{2})x(\d{2})\] - (%(valid_in_names)s+)" % (regex_config)),
+    re.compile("(%(valid_in_names)s+) - \[(\d{2})x(\d{2}-\d{2})\] - (%(valid_in_names)s+)" % (regex_config)),
+    re.compile("(%(valid_in_names)s+) - \[(\d{2})x(Special\d{1,2})\] - (%(valid_in_names)s+)" % (regex_config)),
+    re.compile("(%(valid_in_names)s+) - \[(\d{2})xExtra(\d{1,2})\] - (%(valid_in_names)s+)" % (regex_config)),
+    re.compile("(%(valid_in_names)s+) - \[(\d{2})] - (%(valid_in_names)s+)$" % (regex_config)),
 ]
 
 ###################################
 # Valid filenames, but missing episode name
 #
 # Show name - [04x01]
+# Show name - [04x01-02]
+# Show name - [04xSpecial01]
+# Show name - [04xExtra01]
 r_missing_ep_name = [
-    re.compile("([-\w\d ]+) - \[(\d{2})x\d{2}\]"),
-    re.compile("([-\w\d ]+) - \[(\d{2})x(\d{2}-\d{2})\]"),
-    re.compile("([-\w\d ]+) - \[(\d{2})xSpecial\d{1,2}\]"),
-    re.compile("([-\w\d ]+) - \[(\d{2})xExtra\d{1,2}\]"),
+    re.compile("(%(valid_in_names)s+) - \[(\d{2})x(\d{2})\]" % (regex_config)),
+    re.compile("(%(valid_in_names)s+) - \[(\d{2})x(\d{2}-\d{2})\]"% (regex_config)),
+    re.compile("(%(valid_in_names)s+) - \[(\d{2})x(Special\d{1,2})\]" % (regex_config)),
+    re.compile("(%(valid_in_names)s+) - \[(\d{2})x(Extra\d{1,2})\]" % (regex_config)),
+    re.compile("(%(valid_in_names)s+) - \[(\d{2})x(Extra\d{1,2})\]" % (regex_config))
 ]
 
 # Valid path names
