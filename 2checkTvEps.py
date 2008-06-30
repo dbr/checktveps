@@ -110,8 +110,155 @@ decrappify = [
     re.compile("folder.jpg"),
 ]
 
-# Location to process
-loc = "." # Runs from the current path
+###################################
+# Output-helper to convert array of 
+# numbers (episode numbers) to human-readable string
+###################################
+
+def seq_display(x):
+    """
+    Takes an array of numbers, returns a more readable string representation of them
+    
+    >>> seq_display( [1,2,3, 5,6,7, 10, 20,21,22] )
+    '1->3, 5->7, 10, 20->22'
+    """
+    is_int=[]
+    non_int=[]
+    for cur_x in x:
+        try:
+            tmp_conv = int(cur_x)
+            is_int.append(tmp_conv)
+        except ValueError:
+            non_int.append(cur_x)
+        #end try
+    #end for cur_x
+    
+    if len(is_int) == 0: return x # return original input, no numbers!
+    
+    start = min(is_int)
+    end = max(is_int)
+    
+    if end == start: return start
+    if end - start > 999: return ", ".join([str(y) for y in x]) # too long, return list
+
+    break_start = False
+
+    out = ""
+
+    for i in xrange(start, end + 1):
+        try:
+            is_int.index(i)
+            if not break_start:
+                break_start = i
+        except ValueError:
+            if break_start:
+                if break_start == i - 1:  # start and end are same, its one number
+                    out += "%d, " % (break_start)
+                else:
+                    out += "%d->%d, " % (break_start, i - 1)
+                break_start = False
+        #end try
+    if break_start == i:
+        out += "%d" % (break_start)
+    else:
+        out += "%d->%d" % (break_start, i) # last value
+
+    return out
+#end seq_display
+
+
+###################################
+# Classes to abstract show data
+###################################
+class ShowContainer:
+    def __init__(self):
+        self.shows = {}
+    #end __init__
+    
+    def __getitem__(self, show_name):
+        if not self.shows.has_key(show_name):
+            self.shows[show_name] = Show(show_name)
+        return dict.__getitem__(self.shows, show_name)
+    #end __getitem__
+    
+    def __str__(self):
+        out=""
+        for current_show_name, current_show in self.shows.items():
+            out += str(current_show) + "\n"
+        return out
+        
+class Show:
+    def __init__(self, name):
+        self.show_name = name
+        self.seasons = {}
+    #end __init__
+    
+    def __getitem__(self,season_number):
+        if not self.seasons.has_key(season_number):
+            self.seasons[season_number] = Season(season_number)
+        
+        return dict.__getitem__(self.seasons, season_number)
+    #end __getattr__
+    
+    def __setitem__(self,season_number, season):
+        if not self.seasons.has_key(season_number):
+            self.seasons[season_number] = Season(season_number)
+        
+        self.seasons[season_number] = season
+    #end __setitem__
+    
+    def __str__(self):
+        out = self.show_name + "\n"
+        for cur_season_no, cur_season in self.seasons.items():
+            out += str(cur_season) + "\n"
+        return out
+    #end __str__
+#end Show
+
+class Season:
+    def __init__(self, number):
+        self.season_number = number
+        self.episodes = {}
+    #end __init__
+    
+    def __getitem__(self, episode_number):
+        if not self.episodes.has_key(episode_number):
+            self.episodes[episode_number] = Episode(number = episode_number)
+        
+        return dict.__getitem__(self.episodes, episode_number)
+    #end __getitem__
+    
+    def __setitem__(self,episode_number, episode):
+        if not self.episodes.has_key(episode_number):
+            self.episodes[episode_number] = Episode()
+        
+        self.episodes[episode_number] = episode
+    #end __setitem__
+    
+    def __str__(self):
+        out = "\tSeason %s\n" % (self.season_number)
+        out += "\t\t"
+        all_ep_nums = [cur_ep_num for cur_ep_num in self.episodes.keys()]
+        out += "Episodes " + str(seq_display(all_ep_nums))
+        return out
+    #end __str__
+#end Season
+
+class Episode:
+    def __init__(self, number):
+        self.episode_number = number
+        self.episode={}
+    #end __init__
+    
+    def __getitem__(self,attr):
+        return dict.__getitem__(self.episode, attr)
+    #end __getitem__
+    
+    def __setitem__(self,attr,name):
+        dict.__setitem__(self.episode, attr, name)
+    #end __setitem__
+#end Episode
+
 
 ###################################
 # Find all valid files
