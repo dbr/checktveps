@@ -287,14 +287,6 @@ if files.__len__() == 0:
     print colour('No files found','red')
     sys.exit(1)
 
-
-errors = {
-    1:'malformed name',
-    2:'missing epsiode name',
-    3:'path is incorrect'
-}
-
-
 ###################################
 # Validate filenames
 ###################################
@@ -360,3 +352,21 @@ if len(invalid) > 0:
     
         for c in errors:
             print c['filename']
+
+###################################
+# Show valid names
+###################################
+if valid.__len__() > 0:
+    print colour('INFO','green'), ': Valid file-names found:'
+    allepisodes = ShowContainer()
+    
+    for cur in valid:
+        if len(cur['match']) == 4:
+            showname,seasno,epno,title = cur['match']
+        elif len(cur['match']) == 3:
+            seasno = 1
+            showname,epno,title = cur['match']
+        
+        allepisodes[showname][seasno][epno]['name'] = title
+    #end for cur in valid
+    print allepisodes
