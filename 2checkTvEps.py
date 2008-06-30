@@ -125,6 +125,15 @@ def seq_display(x):
     is_int=[]
     non_int=[]
     for cur_x in x:
+        if cur_x.find("-") != -1:
+            for tmp_split in cur_x.split("-"):
+                try:
+                    tmp_conv = int(tmp_split)
+                    is_int.append(tmp_conv)
+                except ValueError:
+                    non_int.append(cur_x)
+                #end try
+            #end for tmp_split
         try:
             tmp_conv = int(cur_x)
             is_int.append(tmp_conv)
