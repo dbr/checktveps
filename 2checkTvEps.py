@@ -46,7 +46,7 @@ regex_config={}
 
 # Character class for valid episode/show names.
 # Example: [a-zA-Z0-9\-'\ ]
-regex_config['valid_in_names'] = "[\w\(\).'\ \-]"
+regex_config['valid_in_names'] = "[\w\(\).,\[\]'\ \-?]"
 
 # Location to process
 loc = "." # Runs from the current path
@@ -73,11 +73,11 @@ loc = "." # Runs from the current path
 # Show name - [01] - First episode
 
 r_with_ep_name = [
-    re.compile("(%(valid_in_names)s+) - \[(\d{2})x(\d{2})\] - (%(valid_in_names)s+)" % (regex_config)),
-    re.compile("(%(valid_in_names)s+) - \[(\d{2})x(\d{2}-\d{2})\] - (%(valid_in_names)s+)" % (regex_config)),
-    re.compile("(%(valid_in_names)s+) - \[(\d{2})x(Special\d{1,2})\] - (%(valid_in_names)s+)" % (regex_config)),
-    re.compile("(%(valid_in_names)s+) - \[(\d{2})xExtra(\d{1,2})\] - (%(valid_in_names)s+)" % (regex_config)),
-    re.compile("(%(valid_in_names)s+) - \[(\d{2})] - (%(valid_in_names)s+)$" % (regex_config)),
+    re.compile("^(%(valid_in_names)s+) - \[(\d{2})x(\d{2})\] - (%(valid_in_names)s+)$" % (regex_config)),
+    re.compile("^(%(valid_in_names)s+) - \[(\d{2})x(\d{2}-\d{2})\] - (%(valid_in_names)s+)$" % (regex_config)),
+    re.compile("^(%(valid_in_names)s+) - \[(\d{2})x(Special\d{1,2})\] - (%(valid_in_names)s+)$" % (regex_config)),
+    re.compile("^(%(valid_in_names)s+) - \[(\d{2})xExtra(\d{1,2})\] - (%(valid_in_names)s+)$" % (regex_config)),
+    re.compile("^(%(valid_in_names)s+) - \[(\d{2})] - (%(valid_in_names)s+)$" % (regex_config)),
 ]
 
 ###################################
