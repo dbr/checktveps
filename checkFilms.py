@@ -41,7 +41,7 @@ def getError(invalid,errorno):
 #
 # The Film [2004]
 r_with_year = [
-    re.compile("([-\w\d ]+) \[(\d{4})\]"),
+    re.compile("([-\w\d()\[\] ]+) \[(\d{4})\]$"),
 ]
 
 ###################################
@@ -49,7 +49,7 @@ r_with_year = [
 #
 # The Film
 r_missing_year = [
-    re.compile("([-\w\d ]+)"),
+    re.compile("([-\w\d ]+)$"),
 ]
 
 # Valid path names
