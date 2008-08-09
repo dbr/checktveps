@@ -97,8 +97,8 @@ r_missing_ep_name = [
 
 # Valid path names
 r_valid_path = [
-    re.compile("/(.+?)/season (\d{1,2})$"),
-    re.compile("/(.+?)/season (\d{1,2})/extras$"),
+    re.compile("/./(.+?)/season (\d{1,2})$"),
+    re.compile("/./(.+?)/season (\d{1,2})/extras$"),
     re.compile(".+?/Misc")
 ]
 
