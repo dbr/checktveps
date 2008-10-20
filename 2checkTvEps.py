@@ -46,7 +46,7 @@ regex_config={}
 
 # Character class for valid episode/show names.
 # Example: [a-zA-Z0-9\-'\ ]
-regex_config['valid_in_names'] = "[\w\(\).,\[\]'\ \-?]"
+regex_config['valid_in_names'] = "[\w\(\).,\[\]'\ \-?!#]"
 
 # Location to process
 loc = "." # Runs from the current path
