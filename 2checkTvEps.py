@@ -193,7 +193,7 @@ class ShowContainer:
     
     def __str__(self):
         out=""
-        for current_show_name, current_show in self.shows.items():
+        for current_show_name, current_show in sorted( self.shows.items() ):
             out += str(current_show) + "\n"
         return out
         
@@ -219,7 +219,7 @@ class Show:
     
     def __str__(self):
         out = self.show_name + "\n"
-        for cur_season_no, cur_season in self.seasons.items():
+        for cur_season_no, cur_season in sorted( self.seasons.items() ):
             out += str(cur_season) + "\n"
         return out
     #end __str__
