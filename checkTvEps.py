@@ -355,7 +355,7 @@ if len(invalid) > 0:
         errors = getError(invalid,errorno)
         if len(errors) == 0: continue
         
-        errormsg = "# %s (error code %d)" % (errordescr, errorno)
+        errormsg = "# %s (error code %d) #" % (errordescr, errorno)
         print "#"*len(errormsg)
         print errormsg
         print "#"*len(errormsg)
