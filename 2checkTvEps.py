@@ -106,8 +106,9 @@ r_valid_path = [
 # Regex to match valid, but not-to-be-processed files (dot-files, folder.jpg artwork)
 ###################################
 decrappify = [
+    re.compile("^Icon.{1}$"),
     re.compile("(?=^[.]{1}.*)"),
-    re.compile("folder.jpg"),
+    re.compile("^folder.jpg$"),
 ]
 
 ###################################
@@ -247,7 +248,7 @@ class Season:
     def __str__(self):
         out = "\tSeason %s\n" % (self.season_number)
         out += "\t\t"
-        all_ep_nums = [cur_ep_num for cur_ep_num in self.episodes.keys()]
+        all_ep_nums = [cur_ep_num for cur_ep_num in self.episodes.keys() ]
         out += "Episodes " + str(seq_display(all_ep_nums))
         return out
     #end __str__
