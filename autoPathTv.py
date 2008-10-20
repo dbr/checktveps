@@ -23,7 +23,7 @@ regex_config={}
 # Path configs
 
 # Where to move the files
-config['target_path'] = "/Volumes/aodDrive/video/tv/%(file_showname)s/season %(seasno)s/"
+config['target_path'] = "/Volumes/ionDrive/video/tv/%(file_showname)s/season %(seasno)s/"
 
 
 ##############################################
