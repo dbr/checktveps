@@ -193,10 +193,10 @@ def main():
                 print "[!] File already exists, not copying"
             else:
                 if same_partition(oldfile, newpath):
-                    print "[* Moving file]"
+                    print "[*] Moving file"
                     try:
-                        shutil.rename(oldfile, newpath)
-                    except:
+                        shutil.move(oldfile, newpath)
+                    except Exception, errormsg:
                         print "[!] Error moving file! %s" % (errormsg)
                     #end try
                 else:
