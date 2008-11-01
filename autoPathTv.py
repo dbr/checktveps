@@ -158,6 +158,8 @@ def does_file_exist(path):
         file_exists = True
     return file_exists
     
+def same_partition(f1, f2):
+    return os.stat(f1).st_dev == os.stat(f2).st_dev
 
 ###########################
 
@@ -190,14 +192,23 @@ def main():
             if file_exists:
                 print "[!] File already exists, not copying"
             else:
-                print "[*] Copying file"
-                try:
-                    shutil.copy(oldfile, newpath)
-                except Exception, errormsg:
-                    print "[!] Error copying file! %s" % (errormsg)
+                if same_partition(oldfile, newpath):
+                    print "[* Moving file]"
+                    try:
+                        shutil.rename(oldfile, newpath)
+                    except:
+                        print "[!] Error moving file! %s" % (errormsg)
+                    #end try
                 else:
-                    print "[*] ..done"
-                #end try
+                    print "[*] Copying file"
+                    try:
+                        shutil.copy(oldfile, newpath)
+                    except Exception, errormsg:
+                        print "[!] Error copying file! %s" % (errormsg)
+                    else:
+                        print "[*] ..done"
+                    #end try
+                #end if same_partition
             #end if not file_exists
         else:
             print "Skipping file"
