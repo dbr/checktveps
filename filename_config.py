@@ -104,9 +104,11 @@ film_regex['missing_year'] = [
 # Valid paths
 #
 # ./
+# 
 
 film_regex['valid_path'] = [
-    re.compile("/.$"),
+    re.compile(".*?/video/films$"),
+    re.compile(".*?/video/films/Short Films(/.*?)?")
 ]
 
 ###################################
