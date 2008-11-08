@@ -61,6 +61,98 @@ def colour(text,colour="red"):
     #end if
 #end colour
 
+class ProgressBar:
+    """From http://code.activestate.com/recipes/168639/"""
+    def __init__(self, minValue = 0, maxValue = 10, totalWidth=12):
+        self.progBar = "[]"   # This holds the progress bar string
+        self.min = minValue
+        self.max = maxValue
+        self.span = maxValue - minValue
+        self.width = totalWidth
+        self.amount = 0       # When amount == max, we are 100% done 
+        self.updateAmount(0)  # Build progress bar string
+
+    def updateAmount(self, newAmount = 0):
+        if newAmount < self.min: newAmount = self.min
+        if newAmount > self.max: newAmount = self.max
+        self.amount = newAmount
+
+        # Figure out the new percent done, round to an integer
+        diffFromMin = float(self.amount - self.min)
+        percentDone = (diffFromMin / float(self.span)) * 100.0
+        percentDone = round(percentDone)
+        percentDone = int(percentDone)
+
+        # Figure out how many hash bars the percentage should be
+        allFull = self.width - 2
+        numHashes = (percentDone / 100.0) * allFull
+        numHashes = int(round(numHashes))
+
+        # build a progress bar with hashes and spaces
+        self.progBar = "[" + '#'*numHashes + ' '*(allFull-numHashes) + "]"
+
+        # figure out where to put the percentage, roughly centered
+        percentPlace = (len(self.progBar) / 2) - len(str(percentDone)) 
+        percentString = str(percentDone) + "%"
+
+        # slice the percentage into the bar
+        self.progBar = (self.progBar[0:percentPlace] + percentString
+                        + self.progBar[percentPlace+len(percentString):])
+
+    def __str__(self):
+        return str(self.progBar)
+
+def copy_with_prog(src_file, dest_file, overwrite = False, block_size = 512):
+    if not overwrite:
+        if os.path.isfile(dest_file):
+            raise IOError("File exists, not overwriting")
+    
+    # Open src and dest files, get src file size
+    src = open(src_file, "rb")
+    dest = open(dest_file, "wb")
+
+    src_size = os.stat(src_file).st_size
+    
+    # Set progress bar
+    prgb = ProgressBar(totalWidth = 79, maxValue = src_size)
+    
+    # Start copying file
+    cur_block_pos = 0 # a running total of current position
+    while True:
+        cur_block = src.read(block_size)
+        
+        # Update progress bar
+        prgb.updateAmount(cur_block_pos)
+        cur_block_pos += block_size
+        
+        sys.stdout.write(
+            '\r' + str(prgb) + '\r'
+        )
+        
+        # If it's the end of file
+        if not cur_block:
+            # ..write new line to prevent messing up terminal
+            sys.stderr.write('\n')
+            break
+        else:
+            # ..if not, write the block and continue
+            dest.write(cur_block)
+    #end while
+
+    # Close files
+    src.close()
+    dest.close()
+
+    # Check output file is same size as input one!
+    dest_size = os.stat(dest_file).st_size
+
+    if dest_size != src_size:
+        raise IOError(
+            "New file-size does not match original (src: %s, dest: %s)" % (
+            src_size, dest_size)
+        )
+
+
 def findFiles(args):
     """
     Takes a list of files/folders, grabs files inside them. Does not recurse
@@ -202,7 +294,7 @@ def main():
                 else:
                     print "[*] Copying file"
                     try:
-                        shutil.copy(oldfile, newpath)
+                        copy_with_prog(oldfile, newfile)
                     except Exception, errormsg:
                         print "[!] Error copying file! %s" % (errormsg)
                     else:
