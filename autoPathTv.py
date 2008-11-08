@@ -126,7 +126,7 @@ def copy_with_prog(src_file, dest_file, overwrite = False, block_size = 512):
         cur_block_pos += block_size
         
         sys.stdout.write(
-            '\r' + str(prgb) + '\r'
+            '\r%s\r' % str(prgb)
         )
         
         # If it's the end of file
