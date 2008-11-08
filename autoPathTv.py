@@ -224,12 +224,15 @@ def processNames(names, verbose=False):
 def confirm(question="Rename files?"):
     ans = None
     while ans not in ["q", "quit"]:
-        print "y/n/q?",
+        print "y/n/a/q?",
         ans = raw_input()
+        print ans
         if ans.lower() in ["y", "yes"]:
             return True
         elif ans.lower() in ["n", "no"]:
             return False
+        elif ans.lower() in ["a", "always"]:
+            return "always"
     else:
         sys.exit(1)
 #end confirm
@@ -257,15 +260,18 @@ def same_partition(f1, f2):
 
 
 def main():
-    
     parser = OptionParser(usage="%prog [options] <file or directories>")
+    parser.add_option("-a", "--always", dest = "always",
+        action="store_true", default = False, 
+        help="Do not ask for confirmation before copying")
+    
     opts, args = parser.parse_args()
     
     files = findFiles(args)
     files = processNames(files)
 
     # Warn if no files are found, then exit
-    if files.__len__() == 0:
+    if len(files) == 0:
         print colour('No files found','red')
         sys.exit(1)
     #end if files == 0
@@ -278,7 +284,9 @@ def main():
         print "Old path:", oldfile
         print "New path:", newfile
         ans=confirm()
-        if ans:
+        if ans == "always": opts.always = True
+        
+        if ans or opts.always:
             make_path(newpath)
             file_exists = does_file_exist(newfile)
             if file_exists:
