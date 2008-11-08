@@ -59,10 +59,10 @@ tv_regex['missing_ep_name'] = [
 
 # Valid path names
 tv_regex['valid_path'] = [
-    re.compile("/./(.+?)/season (\d{1,2})$"),
-    re.compile("/./(.+?)/season (\d{1,2}) \[720p\]$"),
-    re.compile("/./(.+?)/season (\d{1,2})/extras$"),
-    re.compile(".+?/Misc")
+    re.compile(".*?/video/tv/(.+?)/season (\d{1,2})$"),
+    re.compile(".*?/video/tv/(.+?)/season (\d{1,2}) \[720p\]$"),
+    re.compile(".*?/video/tv/(.+?)/season (\d{1,2})/extras$"),
+    re.compile(".*?/video/tv/Misc")
 ]
 
 ###################################
@@ -70,10 +70,9 @@ tv_regex['valid_path'] = [
 ###################################
 tv_regex['decrappify'] = [
     re.compile("^Icon.{1}$"),
-    re.compile("(?=^[.]{1}.*)"),
+    re.compile("^[.]{1}.*"),
     re.compile("^folder.jpg$"),
 ]
-
 
 
 film_regex = {}

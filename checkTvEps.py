@@ -213,24 +213,25 @@ class Episode:
 allfiles=[]
 for (path,dirs,files) in os.walk(loc):
     for file in files:
-        filename = os.path.join(path,file)
+        filename = os.path.join(os.path.abspath(path), file)
         allfiles.append( str(filename) )
 #end for f
 
-files = [x for x in allfiles if os.path.isfile(x)] # only get files, not folders
-
 # Strip out dotfiles/folder.jpg
+decrappified = []
 for current_file in allfiles:
     current_file_path,current_file_name = os.path.split(current_file)
+    crappy = False
     for cur_decrap in tv_regex['decrappify']:
         if cur_decrap.match(current_file_name):
-            files.remove(current_file)
+            crappy = True
+            break
+    if not crappy: decrappified.append(current_file)
 #end for current_file
-
-files = [os.path.join(loc,x) for x in files] # append path to file name
+allfiles = decrappified
 
 # Warn if no files are found, then exit
-if files.__len__() == 0:
+if len(allfiles) == 0:
     print colour('No files found','red')
     sys.exit(1)
 
@@ -241,7 +242,7 @@ if files.__len__() == 0:
 valid   = []
 invalid = []
 
-for cur in files:
+for cur in allfiles:
     cpath,cfile = os.path.split(cur)
     cfile,cext = os.path.splitext(cfile)
 
@@ -251,7 +252,6 @@ for cur in files:
         if check:
             break
     else:
-        print "invalid path",cpath
         invalid.append({'errorno':3, 'path':cpath,'filename':cfile,
                         'cext':cext})
     #end for cur_checker
@@ -303,7 +303,7 @@ if len(invalid) > 0:
 ###################################
 # Show valid names
 ###################################
-if valid.__len__() > 0:
+if len(valid) > 0:
     print colour('INFO','green'), ': Valid file-names found:'
     allepisodes = ShowContainer()
     
