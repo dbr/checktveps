@@ -132,7 +132,7 @@ def copy_with_prog(src_file, dest_file, overwrite = False, block_size = 512):
         # If it's the end of file
         if not cur_block:
             # ..write new line to prevent messing up terminal
-            sys.stderr.write('\n')
+            print # print line break to clear progress bar
             break
         else:
             # ..if not, write the block and continue
@@ -226,7 +226,6 @@ def confirm(question="Rename files?"):
     while ans not in ["q", "quit"]:
         print "y/n/a/q?",
         ans = raw_input()
-        print ans
         if ans.lower() in ["y", "yes"]:
             return True
         elif ans.lower() in ["n", "no"]:
