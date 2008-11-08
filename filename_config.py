@@ -60,6 +60,7 @@ tv_regex['missing_ep_name'] = [
 # Valid path names
 tv_regex['valid_path'] = [
     re.compile("/./(.+?)/season (\d{1,2})$"),
+    re.compile("/./(.+?)/season (\d{1,2}) \[720p\]$"),
     re.compile("/./(.+?)/season (\d{1,2})/extras$"),
     re.compile(".+?/Misc")
 ]
