@@ -34,6 +34,9 @@ def getError(invalid,errorno):
 # Configs
 ###################################
 
+# Import shared filename pattern config
+from filename_config import tv_regex
+
 # Error-code to error-description mapping
 errors = {
     1:'malformed name',
@@ -41,75 +44,9 @@ errors = {
     3:'path is incorrect'
 }
 
-# Regex configs
-regex_config={}
-
-# Character class for valid episode/show names.
-# Example: [a-zA-Z0-9\-'\ ]
-regex_config['valid_in_names'] = "[\w\(\).,\[\]'\ \-?!#]"
-
 # Location to process
 loc = "." # Runs from the current path
 
-###################################
-# Name regexs
-###################################
-# Valid filenames, with episode name
-# Should return 4 groups:
-# Series name.
-# Season number.
-# Episode number.
-# Episode name.
-# Ignore filetype extension.
-#
-# If there are 3 groups, they are treated as:
-# Series name, epiosde number, episode name. Season number is defaulted to "1"
-#
-# Show name - [01x01-02] - The Episode Name (Part 1)
-# Show name - [01x23] - The Episode Name (Part 1)
-# Show name - [01x23] - The Episode Name
-# Show name - [01xExtra01] - DVD Extra Feature 1
-# Show name - [01xSpecial01] - Special Episode 1
-# Show name - [01] - First episode
-
-r_with_ep_name = [
-    re.compile("^(%(valid_in_names)s+) - \[(\d{2})x(\d{2})\] - (%(valid_in_names)s+)$" % (regex_config)),
-    re.compile("^(%(valid_in_names)s+) - \[(\d{2})x(\d{2}-\d{2})\] - (%(valid_in_names)s+)$" % (regex_config)),
-    re.compile("^(%(valid_in_names)s+) - \[(\d{2})x(Special\d{1,2})\] - (%(valid_in_names)s+)$" % (regex_config)),
-    re.compile("^(%(valid_in_names)s+) - \[(\d{2})xExtra(\d{1,2})\] - (%(valid_in_names)s+)$" % (regex_config)),
-    re.compile("^(%(valid_in_names)s+) - \[(\d{2})] - (%(valid_in_names)s+)$" % (regex_config)),
-]
-
-###################################
-# Valid filenames, but missing episode name
-#
-# Show name - [04x01]
-# Show name - [04x01-02]
-# Show name - [04xSpecial01]
-# Show name - [04xExtra01]
-r_missing_ep_name = [
-    re.compile("(%(valid_in_names)s+) - \[(\d{2})x(\d{2})\]" % (regex_config)),
-    re.compile("(%(valid_in_names)s+) - \[(\d{2})x(\d{2}-\d{2})\]"% (regex_config)),
-    re.compile("(%(valid_in_names)s+) - \[(\d{2})x(Special\d{1,2})\]" % (regex_config)),
-    re.compile("(%(valid_in_names)s+) - \[(\d{2})x(Extra\d{1,2})\]" % (regex_config)),
-    re.compile("(%(valid_in_names)s+) - \[(\d{2})x(Extra\d{1,2})\]" % (regex_config))
-]
-
-# Valid path names
-r_valid_path = [
-    re.compile("/./(.+?)/season (\d{1,2})$"),
-    re.compile("/./(.+?)/season (\d{1,2})/extras$"),
-    re.compile(".+?/Misc")
-]
-
-###################################
-# Regex to match valid, but not-to-be-processed files (dot-files, folder.jpg artwork)
-###################################
-decrappify = [
-    re.compile("^Icon.{1}$"),
-    re.compile("(?=^[.]{1}.*)"),
-    re.compile("^folder.jpg$"),
-]
 
 ###################################
 # Output-helper to convert array of 
@@ -285,7 +222,7 @@ files = [x for x in allfiles if os.path.isfile(x)] # only get files, not folders
 # Strip out dotfiles/folder.jpg
 for current_file in allfiles:
     current_file_path,current_file_name = os.path.split(current_file)
-    for cur_decrap in decrappify:
+    for cur_decrap in tv_regex['decrappify']:
         if cur_decrap.match(current_file_name):
             files.remove(current_file)
 #end for current_file
@@ -308,7 +245,7 @@ for cur in files:
     cpath,cfile = os.path.split(cur)
     cfile,cext = os.path.splitext(cfile)
 
-    for cur_checker in r_valid_path:
+    for cur_checker in tv_regex['valid_path']:
         # Check if path is valid
         check = cur_checker.findall(cpath)
         if check:
@@ -319,7 +256,7 @@ for cur in files:
                         'cext':cext})
     #end for cur_checker
 
-    for cur_checker in r_with_ep_name:
+    for cur_checker in tv_regex['with_ep_name']:
         # Check if filename is valid (with ep name)
         check = cur_checker.findall(cfile)
         if check:
@@ -329,7 +266,7 @@ for cur in files:
             break # Found valid episode, skip to the next one
         #end if
     else:
-        for cur_checker in r_missing_ep_name:
+        for cur_checker in tv_regex['missing_ep_name']:
             # Check for valid name with missing episode name
             check = cur_checker.findall(cfile)
             if check:

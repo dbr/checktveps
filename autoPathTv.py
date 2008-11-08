@@ -29,17 +29,9 @@ config['target_path'] = "/Volumes/ionDrive/video/tv/%(file_showname)s/season %(s
 ##############################################
 # Regex configs
 
-# Character class for valid episode/show names.
-# Example: [a-zA-Z0-9\-'\ ]
-regex_config['valid_in_names'] = "[\w\(\).,\[\]'\ \-?!]"
+# Import shared filename pattern config
+from filename_config import tv_regex
 
-config['name_parse'] = [
-    re.compile("^(%(valid_in_names)s+) - \[(\d{2})x(\d{2})\] - (%(valid_in_names)s+)$" % (regex_config)),
-    re.compile("^(%(valid_in_names)s+) - \[(\d{2})x(\d{2}-\d{2})\] - (%(valid_in_names)s+)$" % (regex_config)),
-    re.compile("^(%(valid_in_names)s+) - \[(\d{2})x(Special\d{1,2})\] - (%(valid_in_names)s+)$" % (regex_config)),
-    re.compile("^(%(valid_in_names)s+) - \[(\d{2})xExtra(\d{1,2})\] - (%(valid_in_names)s+)$" % (regex_config)),
-    re.compile("^(%(valid_in_names)s+) - \[(\d{2})] - (%(valid_in_names)s+)$" % (regex_config)),
-]
 # end configs
 ##############################################
 
@@ -176,7 +168,7 @@ def findFiles(args):
 
 def processNames(names, verbose=False):
     """
-    Takes list of names, runs them though the config['name_parse'] regexs
+    Takes list of names, runs them though the tv_regex['with_ep_name'] regexs
     """
     allEps = []
     for f in names:
@@ -186,7 +178,7 @@ def processNames(names, verbose=False):
         # Remove leading . from extension
         ext = ext.replace(".", "", 1)
         
-        for r in config['name_parse']:
+        for r in tv_regex['with_ep_name']:
             match = r.match(filename)
             if match:
                 showname, seasno, epno, epname = match.groups()

@@ -2,6 +2,20 @@
 #encoding:utf-8
 import os,re,sys
 
+###################################
+# Configs
+###################################
+
+# Import shared filename pattern config
+from filename_config import film_regex
+
+# Location to process
+loc = "." # Runs from the current path
+
+###################################
+# Helper functions
+###################################
+
 def colour(text,colour="red"):
     nocolour=False
     if nocolour: # Colour no supported, return plain text
@@ -30,45 +44,6 @@ def getError(invalid,errorno):
 #end searchError
 
 ###################################
-# Name regexs
-###################################
-# Valid filenames, with episode name
-# Should return 2 groups:
-# Film name.
-# Year.
-#
-# Ignore filetype extension
-#
-# The Film [2004]
-r_with_year = [
-    re.compile("([-\w\d()\[\] ]+) \[(\d{4})\]$"),
-]
-
-###################################
-# Valid filenames, but missing year
-#
-# The Film
-r_missing_year = [
-    re.compile("([-\w\d ]+)$"),
-]
-
-# Valid path names
-r_valid_path = [
-    re.compile("/.$"),
-]
-
-###################################
-# Regex to match valid, but not-to-be-processed files (dot-files, folder.jpg artwork)
-###################################
-decrappify = [
-    re.compile("(?=^[.]{1}.*)"),
-    re.compile("folder.jpg"),
-]
-
-# Location to process
-loc = "." # Runs from the current path
-
-###################################
 # Find all valid files
 ###################################
 allfiles=[]
@@ -83,7 +58,7 @@ files = [x for x in allfiles if os.path.isfile(x)] # only get files, not folders
 # Strip out dotfiles/folder.jpg
 for current_file in allfiles:
     current_file_path,current_file_name = os.path.split(current_file)
-    for cur_decrap in decrappify:
+    for cur_decrap in film_regex['decrappify']:
         if cur_decrap.match(current_file_name):
             files.remove(current_file)
 #end for file
@@ -112,7 +87,7 @@ for cur in files:
     cpath,cfile = os.path.split(cur)
     cfile,cext = os.path.splitext(cfile)
 
-    for cur_checker in r_valid_path:
+    for cur_checker in film_regex['valid_path']:
         # Check if path is valid
         check = cur_checker.findall(cpath)
         if check:
@@ -122,7 +97,7 @@ for cur in files:
                         'cext':cext})
     #end for cur_checker
 
-    for cur_checker in r_with_year:
+    for cur_checker in film_regex['with_year']:
         # Check if filename is valid (with ep name)
         check = cur_checker.findall(cfile)
         if check:
@@ -132,7 +107,7 @@ for cur in files:
             break # Found valid episode, skip to the next one
         #end if
     else:
-        for cur_checker in r_missing_year:
+        for cur_checker in film_regex['missing_year']:
             # Check for valid name with missing episode name
             check = cur_checker.findall(cfile)
             if check:
