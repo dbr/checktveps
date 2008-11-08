@@ -31,7 +31,7 @@ config['target_path'] = "/Volumes/ionDrive/video/tv/%(file_showname)s/season %(s
 
 # Character class for valid episode/show names.
 # Example: [a-zA-Z0-9\-'\ ]
-regex_config['valid_in_names'] = "[\w\(\).,\[\]'\ \-?]"
+regex_config['valid_in_names'] = "[\w\(\).,\[\]'\ \-?!]"
 
 config['name_parse'] = [
     re.compile("^(%(valid_in_names)s+) - \[(\d{2})x(\d{2})\] - (%(valid_in_names)s+)$" % (regex_config)),
