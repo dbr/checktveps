@@ -298,7 +298,8 @@ if len(invalid) > 0:
         print "#"*len(errormsg)
     
         for c in errors:
-            print c['filename']
+            cur_path = os.path.join(c['path'], c['filename'] + c['cext'])
+            print cur_path
 
 ###################################
 # Show valid names
