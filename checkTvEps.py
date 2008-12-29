@@ -2,8 +2,8 @@
 #encoding:utf-8
 import os, sys
 
-def colour(text,colour="red"):
-    nocolour=False
+def colour(text, colour="red"):
+    nocolour = False
     if nocolour: # Colour no supported, return plain text
         return text
     #end if
