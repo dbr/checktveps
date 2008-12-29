@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #encoding:utf-8
-import os,re,sys
+import os, sys
 
 def colour(text,colour="red"):
     nocolour=False
