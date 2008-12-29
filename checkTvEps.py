@@ -2,6 +2,9 @@
 #encoding:utf-8
 import os, sys
 
+# Import shared filename pattern config
+from filename_config import tv_regex
+
 def colour(text, colour="red"):
     nocolour = False
     if nocolour: # Colour no supported, return plain text
@@ -28,25 +31,6 @@ def getError(invalid,errorno):
             ret.append(cur)
     return ret
 #end searchError
-
-
-###################################
-# Configs
-###################################
-
-# Import shared filename pattern config
-from filename_config import tv_regex
-
-# Error-code to error-description mapping
-errors = {
-    1:'malformed name',
-    2:'missing epsiode name',
-    3:'path is incorrect'
-}
-
-# Location to process
-loc = "." # Runs from the current path
-
 
 ###################################
 # Output-helper to convert array of 
@@ -221,6 +205,16 @@ def find_files(loc):
  
 
 def main():
+    # Error-code to error-description mapping
+    errors = {
+        1:'malformed name',
+        2:'missing epsiode name',
+        3:'path is incorrect'
+    }
+
+    # Location to process
+    loc = "." # Runs from the current path
+    
     ###################################
     # Find all valid files
     ###################################
