@@ -207,114 +207,126 @@ class Episode:
 #end Episode
 
 
-###################################
-# Find all valid files
-###################################
-allfiles=[]
-for (path,dirs,files) in os.walk(loc):
-    for file in files:
-        filename = os.path.join(os.path.abspath(path), file)
-        allfiles.append( str(filename) )
-#end for f
+def find_files(loc):
+    """Recursivly finds files in a directory
+    """
+    allfiles=[]
+    for (path,dirs,files) in os.walk(loc):
+        for file in files:
+            filename = os.path.join(os.path.abspath(path), file)
+            allfiles.append( str(filename) )
+    return allfiles
+#end find_files
+   
+ 
 
-# Strip out dotfiles/folder.jpg
-decrappified = []
-for current_file in allfiles:
-    current_file_path,current_file_name = os.path.split(current_file)
-    crappy = False
-    for cur_decrap in tv_regex['decrappify']:
-        if cur_decrap.match(current_file_name):
-            crappy = True
-            break
-    if not crappy: decrappified.append(current_file)
-#end for current_file
-allfiles = decrappified
-
-# Warn if no files are found, then exit
-if len(allfiles) == 0:
-    print colour('No files found','red')
-    sys.exit(1)
-
-###################################
-# Validate filenames
-###################################
-
-valid   = []
-invalid = []
-
-for cur in allfiles:
-    cpath,cfile = os.path.split(cur)
-    cfile,cext = os.path.splitext(cfile)
-
-    for cur_checker in tv_regex['valid_path']:
-        # Check if path is valid
-        check = cur_checker.findall(cpath)
-        if check:
-            break
-    else:
-        invalid.append({'errorno':3, 'path':cpath,'filename':cfile,
-                        'cext':cext})
-    #end for cur_checker
-
-    for cur_checker in tv_regex['with_ep_name']:
-        # Check if filename is valid (with ep name)
-        check = cur_checker.findall(cfile)
-        if check:
-            # Valid file name
-            valid.append({'path':cpath,'filename':cfile,
-                            'cext':cext, 'match':check[0]})
-            break # Found valid episode, skip to the next one
-        #end if
-    else:
-        for cur_checker in tv_regex['missing_ep_name']:
-            # Check for valid name with missing episode name
-            check = cur_checker.findall(cfile)
-            if check:
-                invalid.append({'errorno':2, 'path':cpath,'filename':cfile,
-                                'cext':cext})
+def main():
+    ###################################
+    # Find all valid files
+    ###################################
+    allfiles = find_files(loc)
+    
+    # Strip out dotfiles/folder.jpg
+    decrappified = []
+    for current_file in allfiles:
+        current_file_path,current_file_name = os.path.split(current_file)
+        crappy = False
+        for cur_decrap in tv_regex['decrappify']:
+            if cur_decrap.match(current_file_name):
+                crappy = True
                 break
-            #end if check
+        if not crappy: decrappified.append(current_file)
+    #end for current_file
+    allfiles = decrappified
+
+    # Warn if no files are found, then exit
+    if len(allfiles) == 0:
+        print colour('No files found','red')
+        sys.exit(1)
+
+    ###################################
+    # Validate filenames
+    ###################################
+
+    valid   = []
+    invalid = []
+
+    for cur in allfiles:
+        cpath,cfile = os.path.split(cur)
+        cfile,cext = os.path.splitext(cfile)
+
+        for cur_checker in tv_regex['valid_path']:
+            # Check if path is valid
+            check = cur_checker.findall(cpath)
+            if check:
+                break
         else:
-            # Doesn't match valid-name or missing-ep-name regexs, it's invalid
-            invalid.append({'errorno':1, 'path':cpath,'filename':cfile,
+            invalid.append({'errorno':3, 'path':cpath,'filename':cfile,
                             'cext':cext})
         #end for cur_checker
-    #end for cur_checker
-#end for
 
-###################################
-# Show invalid names
-###################################
-if len(invalid) > 0:
-    print colour('WARNING', 'red'), ': Invalid file-names found'
-    
-    for errorno,errordescr in errors.items():
-        errors = getError(invalid,errorno)
-        if len(errors) == 0: continue
-        
-        errormsg = "# %s (error code %d) #" % (errordescr, errorno)
-        print "#"*len(errormsg)
-        print errormsg
-        print "#"*len(errormsg)
-    
-        for c in errors:
-            cur_path = os.path.join(c['path'], c['filename'] + c['cext'])
-            print cur_path
+        for cur_checker in tv_regex['with_ep_name']:
+            # Check if filename is valid (with ep name)
+            check = cur_checker.findall(cfile)
+            if check:
+                # Valid file name
+                valid.append({'path':cpath,'filename':cfile,
+                                'cext':cext, 'match':check[0]})
+                break # Found valid episode, skip to the next one
+            #end if
+        else:
+            for cur_checker in tv_regex['missing_ep_name']:
+                # Check for valid name with missing episode name
+                check = cur_checker.findall(cfile)
+                if check:
+                    invalid.append({'errorno':2, 'path':cpath,'filename':cfile,
+                                    'cext':cext})
+                    break
+                #end if check
+            else:
+                # Doesn't match valid-name or missing-ep-name regexs, it's invalid
+                invalid.append({'errorno':1, 'path':cpath,'filename':cfile,
+                                'cext':cext})
+            #end for cur_checker
+        #end for cur_checker
+    #end for
 
-###################################
-# Show valid names
-###################################
-if len(valid) > 0:
-    print colour('INFO','green'), ': Valid file-names found:'
-    allepisodes = ShowContainer()
+    ###################################
+    # Show invalid names
+    ###################################
+    if len(invalid) > 0:
+        print colour('WARNING', 'red'), ': Invalid file-names found'
     
-    for cur in valid:
-        if len(cur['match']) == 4:
-            showname,seasno,epno,title = cur['match']
-        elif len(cur['match']) == 3:
-            seasno = 1
-            showname,epno,title = cur['match']
+        for errorno,errordescr in errors.items():
+            errors = getError(invalid,errorno)
+            if len(errors) == 0: continue
         
-        allepisodes[showname][seasno][epno]['name'] = title
-    #end for cur in valid
-    print allepisodes
+            errormsg = "# %s (error code %d) #" % (errordescr, errorno)
+            print "#"*len(errormsg)
+            print errormsg
+            print "#"*len(errormsg)
+    
+            for c in errors:
+                cur_path = os.path.join(c['path'], c['filename'] + c['cext'])
+                print cur_path
+
+    ###################################
+    # Show valid names
+    ###################################
+    if len(valid) > 0:
+        print colour('INFO','green'), ': Valid file-names found:'
+        allepisodes = ShowContainer()
+    
+        for cur in valid:
+            if len(cur['match']) == 4:
+                showname,seasno,epno,title = cur['match']
+            elif len(cur['match']) == 3:
+                seasno = 1
+                showname,epno,title = cur['match']
+        
+            allepisodes[showname][seasno][epno]['name'] = title
+        #end for cur in valid
+        print allepisodes
+
+if __name__ == '__main__':
+    main()
