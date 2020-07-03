@@ -35,6 +35,36 @@ from filename_config import tv_regex
 # end configs
 ##############################################
 
+def cursor_vis(text, hide=False, show=False):
+    """Control the cursor visibility while writing the output to terminal
+    
+    PARAMETERS
+    ----------
+    text: str
+        Text to be printed with cursor visibility adjusted. By default cursor will be hidden
+        only for the length of the text
+        
+    hide: bool
+        If `True` only hide the cursor
+        
+    show: bool
+        If `True` make the cursor visible
+        
+    RETURNS
+    -------
+        Modified string with the appropriate cursor visibility settings
+    
+    
+    HIDE = chr(27)+'[?25l' # l-> low, doesn't show the cursor on the terminal
+    SHOW = chr(27)+'[?25h' # h-> high, show the cursor on the terminal
+    
+    if hide:
+        return HIDE + text
+    elif show:
+        return text + SHOW
+    else:
+        return HIDE + text + SHOW
+
 def colour(text,colour="red"):
     nocolour=False
     if nocolour: # Colour no supported, return plain text
@@ -118,13 +148,13 @@ def copy_with_prog(src_file, dest_file, overwrite = False, block_size = 512):
         cur_block_pos += block_size
         
         sys.stdout.write(
-            '\r%s\r' % str(prgb)
+            cursor_vis('\r%s\r' % str(prgb), hide=True)
         )
         
         # If it's the end of file
         if not cur_block:
             # ..write new line to prevent messing up terminal
-            print # print line break to clear progress bar
+            print(cursor_vis('', show=True)) # print line break to clear progress bar
             break
         else:
             # ..if not, write the block and continue
